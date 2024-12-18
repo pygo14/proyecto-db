@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tinder para Habilidades</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background-color: #f9f9f9;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+    }
+    .card p {
+      margin: 4px 0;
+    }
+    .search-bar {
+      margin-bottom: 20px;
+    }
+    .search-bar input {
+      width: 70%;
+      padding: 8px;
+    }
+    .search-bar button {
+      padding: 8px 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tinder para Habilidades</h1>
+
+    <div class="search-bar">
+      <input type="text" id="skillInput" placeholder="Buscar habilidad (e.g., hablar en público)" />
+      <button onclick="searchSkills()">Buscar</button>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+     const API_URL = "http://localhost:3000"; // Cambia esta URL por el endpoint real.
+
+    // Función para buscar habilidades
+    async function searchSkills() {
+      const skill = document.getElementById("skillInput").value.trim();
+      if (!skill) {
+        alert("Por favor, escribe una habilidad para buscar.");
+        return;
+      }
+
+      try {
+        // Llamada a la API para buscar usuarios con habilidades
+        const response = await fetch(`${API_URL}/users/search?skill=${encodeURIComponent(skill)}`);
+        const data = await response.json();
+
+        // Mostrar resultados en la interfaz
+        displayResults(data);
+      } catch (error) {
+        console.error("Error al buscar habilidades:", error);
+        alert("Hubo un problema al buscar. Intenta de nuevo más tarde.");
+      }
+    }
+
+    // Función para mostrar resultados
+    function displayResults(data) {
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = ""; // Limpiar resultados anteriores
+
+      if (data.length === 0) {
+        resultsDiv.innerHTML = "<p>No se encontraron personas con esta habilidad.</p>";
+        return;
+      }
+
+      data.forEach((user) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <h3>${user.name}</h3>
+          <p><strong>Habilidades:</strong> ${user.skills.join(", ")}</p>
+          <p><strong>Tarifa por hora:</strong> $${user.hourly_rate} USD</p>
+          <p><strong>Rasgos de personalidad:</strong> ${user.personality_traits.join(", ")}</p>
+          <button onclick="contactUser('${user.user_id}')">Contactar</button>
+        `;
+
+        resultsDiv.appendChild(card);
+      });
+    }
+
+    // Función para contactar a un usuario
+    function contactUser(userId) {
+      alert(`Se ha iniciado contacto con el usuario ID: ${userId}.`);
+      // Aquí se podría redirigir a una nueva página o abrir un formulario de contacto
+    }
+  </script>
+</body>
+</html>
